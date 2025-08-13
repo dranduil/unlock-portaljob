@@ -57,6 +57,17 @@ export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
     { value: '150000+', label: '$150k+' },
   ];
 
+  const parseSalaryRange = (rangeValue: string): [number | undefined, number | undefined] => {
+    if (rangeValue.endsWith('+')) {
+      const min = Number(rangeValue.slice(0, -1));
+      return [isNaN(min) ? undefined : min, undefined];
+    }
+    const [minStr, maxStr] = rangeValue.split('-');
+    const min = Number(minStr);
+    const max = Number(maxStr);
+    return [isNaN(min) ? undefined : min, isNaN(max) ? undefined : max];
+  };
+
   const categories = [
     { value: 'software-development', label: 'Software Development' },
     { value: 'data-science', label: 'Data Science' },
@@ -78,14 +89,14 @@ export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
           Job Category
         </Label>
         <Select
-          value={filters.category || ''}
+          value={filters.category ?? 'all'}
           onValueChange={(value) => handleFilterChange('category', value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="All categories" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All categories</SelectItem>
+            <SelectItem value="all">All categories</SelectItem>
             {categories.map((category) => (
               <SelectItem key={category.value} value={category.value}>
                 {category.label}
@@ -103,14 +114,14 @@ export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
           Work Location
         </Label>
         <Select
-          value={filters.remote || ''}
+          value={filters.remote ?? 'all'}
           onValueChange={(value) => handleFilterChange('remote', value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="All locations" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All locations</SelectItem>
+            <SelectItem value="all">All locations</SelectItem>
             {locationModes.map((mode) => (
               <SelectItem key={mode.value} value={mode.value}>
                 {mode.label}
@@ -128,14 +139,14 @@ export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
           Employment Type
         </Label>
         <Select
-          value={filters.type || ''}
+          value={filters.type ?? 'all'}
           onValueChange={(value) => handleFilterChange('type', value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="All types" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All types</SelectItem>
+            <SelectItem value="all">All types</SelectItem>
             {employmentTypes.map((type) => (
               <SelectItem key={type.value} value={type.value}>
                 {type.label}
@@ -153,14 +164,14 @@ export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
           Experience Level
         </Label>
         <Select
-          value={filters.seniority || ''}
+          value={filters.seniority ?? 'all'}
           onValueChange={(value) => handleFilterChange('seniority', value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="All levels" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All levels</SelectItem>
+            <SelectItem value="all">All levels</SelectItem>
             {seniorityLevels.map((level) => (
               <SelectItem key={level.value} value={level.value}>
                 {level.label}
@@ -198,7 +209,7 @@ export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
           {/* Quick salary ranges */}
           <div className="space-y-2">
             {salaryRanges.map((range) => {
-              const [min, max] = range.value.split('-').map(v => v === '+' ? undefined : Number(v));
+              const [min, max] = parseSalaryRange(range.value);
               const isSelected = filters.minSalary === min && filters.maxSalary === max;
               
               return (
@@ -253,14 +264,14 @@ export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
           Date Posted
         </Label>
         <Select
-          value={filters.datePosted || ''}
+          value={filters.datePosted ?? 'all'}
           onValueChange={(value) => handleFilterChange('datePosted', value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Any time" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Any time</SelectItem>
+            <SelectItem value="all">Any time</SelectItem>
             <SelectItem value="today">Today</SelectItem>
             <SelectItem value="week">This week</SelectItem>
             <SelectItem value="month">This month</SelectItem>

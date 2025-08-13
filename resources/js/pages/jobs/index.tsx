@@ -49,6 +49,7 @@ interface JobFilters {
   seniority?: string;
   minSalary?: number;
   maxSalary?: number;
+  datePosted?: string;
 }
 
 export default function JobsIndex() {
@@ -64,20 +65,32 @@ export default function JobsIndex() {
   });
 
   useEffect(() => {
+    // Fetch from API whenever filters or page change
     fetchJobs();
-  }, [filters, pagination.currentPage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(filters), pagination.currentPage]);
 
   const fetchJobs = async () => {
     setLoading(true);
     try {
+      const normalized: Record<string, string> = {};
+      Object.entries(filters).forEach(([k, v]) => {
+        if (v && v !== 'all') normalized[k] = String(v);
+      });
       const params = new URLSearchParams({
-        ...filters,
+        ...normalized,
         page: pagination.currentPage.toString()
       });
-      
-      const response = await fetch(`/api/v1/jobs?${params}`);
+      const response = await fetch(`/api/v1/jobs?${params.toString()}`, {
+        headers: {
+          Accept: 'application/json'
+        }
+      });
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`HTTP ${response.status} on /api/v1/jobs: ${text.slice(0, 200)}`);
+      }
       const data = await response.json();
-      
       setJobs(data.data);
       setPagination({
         currentPage: data.meta.page,
@@ -93,8 +106,20 @@ export default function JobsIndex() {
   };
 
   const handleFilterChange = (newFilters: Partial<JobFilters>) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
-    setPagination(prev => ({ ...prev, currentPage: 1 }));
+    let changed = false;
+    setFilters(prev => {
+      const next = { ...prev, ...newFilters };
+      const prevStr = JSON.stringify(prev);
+      const nextStr = JSON.stringify(next);
+      if (prevStr !== nextStr) {
+        changed = true;
+        return next;
+      }
+      return prev;
+    });
+    if (changed) {
+      setPagination(prev => ({ ...prev, currentPage: 1 }));
+    }
   };
 
   const handleSearch = (searchTerm: string) => {
