@@ -8,6 +8,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class JobController extends Controller
@@ -160,7 +161,7 @@ class JobController extends Controller
 
         $data = $validator->validated();
         $data['company_id'] = $companyId;
-        $data['slug'] = \Str::slug($data['title']);
+        $data['slug'] = Str::slug($data['title']);
         $data['status'] = 'draft';
 
         $job = JobPosting::create($data);
@@ -217,7 +218,7 @@ class JobController extends Controller
         $data = $validator->validated();
         
         if (isset($data['title'])) {
-            $data['slug'] = \Str::slug($data['title']);
+            $data['slug'] = Str::slug($data['title']);
         }
 
         $job->update($data);

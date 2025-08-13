@@ -15,6 +15,7 @@ interface JobFiltersProps {
     seniority?: string;
     minSalary?: number;
     maxSalary?: number;
+    datePosted?: string;
   };
   onFilterChange: (filters: Partial<JobFiltersProps['filters']>) => void;
 }
@@ -56,8 +57,46 @@ export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
     { value: '150000+', label: '$150k+' },
   ];
 
+  const categories = [
+    { value: 'software-development', label: 'Software Development' },
+    { value: 'data-science', label: 'Data Science' },
+    { value: 'design', label: 'Design' },
+    { value: 'marketing', label: 'Marketing' },
+    { value: 'sales', label: 'Sales' },
+    { value: 'customer-support', label: 'Customer Support' },
+    { value: 'product-management', label: 'Product Management' },
+    { value: 'operations', label: 'Operations' },
+    { value: 'finance', label: 'Finance' },
+    { value: 'hr', label: 'Human Resources' },
+  ];
+
   return (
     <div className="space-y-6">
+      {/* Category */}
+      <div>
+        <Label className="text-sm font-medium text-gray-700 mb-2 block">
+          Job Category
+        </Label>
+        <Select
+          value={filters.category || ''}
+          onValueChange={(value) => handleFilterChange('category', value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="All categories" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">All categories</SelectItem>
+            {categories.map((category) => (
+              <SelectItem key={category.value} value={category.value}>
+                {category.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <Separator />
+
       {/* Location Mode */}
       <div>
         <Label className="text-sm font-medium text-gray-700 mb-2 block">
@@ -214,8 +253,8 @@ export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
           Date Posted
         </Label>
         <Select
-          value=""
-          onValueChange={() => {}} // TODO: Implement date filtering
+          value={filters.datePosted || ''}
+          onValueChange={(value) => handleFilterChange('datePosted', value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Any time" />
