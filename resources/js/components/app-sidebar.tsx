@@ -118,25 +118,16 @@ const adminNavItems: NavItem[] = [
     },
 ];
 
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Help & Support',
-        href: '/help',
-        icon: BookOpen,
-    },
-    {
-        title: 'Privacy Policy',
-        href: '/privacy',
-        icon: Folder,
-    },
-];
+const footerNavItems: NavItem[] = [];
 
 export function AppSidebar() {
-    // TODO: Get user role from auth context
-    const userRole = 'candidate'; // This should come from auth context
+    // Use Ziggy-provided page props to infer role if available
+    // Fallback to 'candidate'
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const role = (typeof window !== 'undefined' && (window as any)?.Ziggy?.props?.auth?.user?.role) || 'candidate';
     
     const getNavItems = () => {
-        switch (userRole) {
+        switch (role as 'candidate' | 'recruiter' | 'admin') {
             case 'recruiter':
                 return [...mainNavItems, ...recruiterNavItems];
             case 'admin':
