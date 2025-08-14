@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Web\JobsController as WebJobsController;
 use App\Http\Controllers\Web\CompaniesController as WebCompaniesController;
+use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\MeController;
+use App\Http\Controllers\Web\RecruiterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,43 +39,24 @@ Route::get('/companies/{slug}', [WebCompaniesController::class, 'show'])->name('
 Route::get('/companies/{slug}/jobs', [WebCompaniesController::class, 'jobs'])->name('companies.jobs');
 
 // Dashboard routes
-Route::get('/dashboard', function () {
-    return Inertia::render('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/me/profile', function () {
-    return Inertia::render('me/profile');
-})->middleware(['auth', 'verified'])->name('profile');
-
-Route::get('/me/cv', function () {
-    return Inertia::render('me/cv');
-})->middleware(['auth', 'verified'])->name('cv');
-
-Route::get('/me/saved-jobs', function () {
-    return Inertia::render('me/saved-jobs');
-})->middleware(['auth', 'verified'])->name('saved-jobs');
-
-Route::get('/me/matches', function () {
-    return Inertia::render('me/matches');
-})->middleware(['auth', 'verified'])->name('matches');
-
-Route::get('/me/applications', function () {
-    return Inertia::render('me/applications');
-})->middleware(['auth', 'verified'])->name('applications');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/me/profile', [MeController::class, 'profile'])->name('profile');
+    // Compatibility alias for components expecting Breeze's default route name
+    Route::get('/profile', [MeController::class, 'profile'])->name('profile.edit');
+    Route::get('/me/cv', [MeController::class, 'cv'])->name('cv');
+    Route::get('/me/saved-jobs', [MeController::class, 'savedJobs'])->name('saved-jobs');
+    Route::get('/me/matches', [MeController::class, 'matches'])->name('matches');
+    Route::get('/me/applications', [MeController::class, 'applications'])->name('applications');
+});
 
 // Recruiter routes
 Route::prefix('recruiter')->middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('recruiter/dashboard');
-    })->name('recruiter.dashboard');
-    
-    Route::get('/jobs/create', function () {
-        return Inertia::render('recruiter/jobs/create');
-    })->name('recruiter.jobs.create');
-    
-    Route::get('/applications', function () {
-        return Inertia::render('recruiter/applications/index');
-    })->name('recruiter.applications.index');
+    Route::get('/dashboard', [RecruiterController::class, 'dashboard'])->name('recruiter.dashboard');
+    Route::get('/jobs/create', [RecruiterController::class, 'createJob'])->name('recruiter.jobs.create');
+    Route::get('/applications', [RecruiterController::class, 'applications'])->name('recruiter.applications.index');
 });
 
 // (removed placeholders; using controllers above)
