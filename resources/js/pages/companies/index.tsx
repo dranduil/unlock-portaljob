@@ -172,7 +172,39 @@ export default function CompaniesIndex() {
 
   return (
     <>
-      <Head title="Companies - Unlock Portal Job" />
+      <Head title="Companies - Unlock Portal Job">
+        {/* JSON-LD Structured Data for SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ItemList",
+              "name": "Companies Directory",
+              "description": "Discover great companies that align with your career goals and values",
+              "numberOfItems": companies.length,
+              "itemListElement": companies.map((company, index) => ({
+                "@type": "ListItem",
+                "position": index + 1,
+                "item": {
+                  "@type": "Organization",
+                  "name": company.name,
+                  "description": company.description,
+                  "url": company.website || `${window.location.origin}/companies/${company.slug}`,
+                  "logo": company.logo_url,
+                  "industry": company.industry,
+                  "numberOfEmployees": company.size,
+                  "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": company.locations[0]?.split(',')[0] || "Multiple Locations"
+                  },
+                  "sameAs": company.verified_at ? `${window.location.origin}/companies/${company.slug}` : undefined
+                }
+              }))
+            })
+          }}
+        />
+      </Head>
       
       <div className="min-h-screen bg-gray-50">
         {/* Header */}

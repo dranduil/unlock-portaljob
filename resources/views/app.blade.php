@@ -50,23 +50,85 @@
         <meta name="twitter:title" content="Unlock Portal Job – International Job Portal">
         <meta name="twitter:description" content="Find your dream job with transparent listings, ATS-friendly CVs, and global opportunities.">
         
-        {{-- Google Analytics 4 (GA4) - Replace GA_MEASUREMENT_ID with your actual GA4 ID --}}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+        {{-- JSON-LD Structured Data for SEO --}}
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Unlock Portal Job",
+            "description": "International job portal with transparent listings, ATS-friendly CVs, and global opportunities",
+            "url": "{{ url('/') }}",
+            "potentialAction": {
+                "@type": "SearchAction",
+                "target": "{{ url('/jobs') }}?search={search_term_string}",
+                "query-input": "required name=search_term_string"
+            },
+            "publisher": {
+                "@type": "Organization",
+                "name": "Unlock Portal Job",
+                "url": "{{ url('/') }}",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": "{{ url('/logo.svg') }}",
+                    "width": 512,
+                    "height": 512
+                }
+            },
+            "sameAs": [
+                "https://www.linkedin.com/company/unlock-portal-job",
+                "https://twitter.com/unlockportaljob",
+                "https://www.facebook.com/unlockportaljob"
+            ]
+        }
+        </script>
+        
+        {{-- Organization Schema --}}
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Unlock Portal Job",
+            "description": "Leading international job portal connecting talented professionals with global opportunities",
+            "url": "{{ url('/') }}",
+            "logo": "{{ url('/logo.svg') }}",
+            "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer service",
+                "email": "support@unlockportaljob.com",
+                "availableLanguage": ["English", "Spanish", "French", "German"]
+            },
+            "address": {
+                "@type": "PostalAddress",
+                "addressCountry": "International"
+            },
+            "foundingDate": "2024",
+            "numberOfEmployees": "50-100",
+            "industry": "Employment Services",
+            "serviceType": "Job Portal"
+        }
+        </script>
+        
+        {{-- Google Analytics 4 (GA4) --}}
+        @if(config('google-analytics.enable_ga4') && config('google-analytics.ga4_measurement_id') !== 'GA_MEASUREMENT_ID')
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ config('google-analytics.ga4_measurement_id') }}"></script>
         <script>
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'GA_MEASUREMENT_ID');
+            gtag('config', '{{ config('google-analytics.ga4_measurement_id') }}');
         </script>
+        @endif
         
-        {{-- Google Tag Manager (GTM) - Alternative implementation - Replace GTM-XXXXXXX with your actual GTM ID --}}
+        {{-- Google Tag Manager (GTM) --}}
+        @if(config('google-analytics.enable_gtm') && config('google-analytics.gtm_container_id') !== 'GTM-XXXXXXX')
         <!-- Google Tag Manager -->
         <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
         new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
         j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-        })(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
+        })(window,document,'script','dataLayer','{{ config('google-analytics.gtm_container_id') }}');</script>
         <!-- End Google Tag Manager -->
+        @endif
 
         <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -81,11 +143,13 @@
         @inertiaHead
     </head>
     <body class="font-sans antialiased">
-        {{-- Google Tag Manager (noscript) - Replace GTM-XXXXXXX with your actual GTM ID --}}
+        {{-- Google Tag Manager (noscript) --}}
+        @if(config('google-analytics.enable_gtm') && config('google-analytics.gtm_container_id') !== 'GTM-XXXXXXX')
         <!-- Google Tag Manager (noscript) -->
-        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ config('google-analytics.gtm_container_id') }}"
         height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- End Google Tag Manager (noscript) -->
+        @endif
         
         @inertia
     </body>

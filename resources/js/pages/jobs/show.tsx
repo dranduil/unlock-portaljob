@@ -174,7 +174,61 @@ export default function JobShow({ job, auth }: PageProps) {
 
   return (
     <>
-      <Head title={`${job.title} at ${job.company.name} - Unlock Portal Job`} />
+      <Head title={`${job.title} at ${job.company.name} - Unlock Portal Job`}>
+        {/* JSON-LD Structured Data for SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "JobPosting",
+              "title": job.title,
+              "description": job.description,
+              "datePosted": job.published_at,
+              "validThrough": job.expires_at || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+              "employmentType": job.employment_type,
+              "hiringOrganization": {
+                "@type": "Organization",
+                "name": job.company.name,
+                "url": job.company.website || `${window.location.origin}/companies/${job.company.slug}`,
+                "logo": job.company.logo_url,
+                "sameAs": job.company.verified_at ? `${window.location.origin}/companies/${job.company.slug}` : undefined
+              },
+              "jobLocation": {
+                "@type": "Place",
+                "address": {
+                  "@type": "PostalAddress",
+                  "addressLocality": job.city,
+                  "addressRegion": job.state,
+                  "addressCountry": job.country
+                },
+                "jobLocationType": job.location_mode === 'remote' ? 'TELECOMMUTE' : 
+                                 job.location_mode === 'hybrid' ? 'HYBRID' : 'ONSITE'
+              },
+              "applicantLocationRequirements": job.location_mode === 'remote' ? {
+                "@type": "Country",
+                "name": "Worldwide"
+              } : undefined,
+              "baseSalary": job.salary_min ? {
+                "@type": "MonetaryAmount",
+                "currency": job.currency,
+                "value": {
+                  "@type": "QuantitativeValue",
+                  "minValue": job.salary_min,
+                  "maxValue": job.salary_max || job.salary_min,
+                  "unitText": "YEAR"
+                }
+              } : undefined,
+              "qualifications": job.requirements,
+              "experienceRequirements": job.seniority,
+              "jobBenefits": job.benefits,
+              "industry": job.company.industry,
+              "url": `${window.location.origin}/jobs/${job.slug}`,
+              "category": job.categories.map(cat => cat.name).join(', ')
+            })
+          }}
+        />
+      </Head>
       
       <div className="min-h-screen bg-gray-50">
         {/* Header */}

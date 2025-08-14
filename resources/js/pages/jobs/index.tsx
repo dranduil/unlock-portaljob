@@ -64,6 +64,65 @@ export default function JobsIndex() {
     lastPage: 1
   });
 
+  // Generate JSON-LD structured data for jobs
+  const generateJobPostingSchema = () => {
+    if (jobs.length === 0) return null;
+    
+    const jobPostings = jobs.map(job => ({
+      "@type": "JobPosting",
+      "title": job.title,
+      "description": `Job opportunity for ${job.title} at ${job.company.name}`,
+      "datePosted": job.published_at,
+      "validThrough": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+      "employmentType": job.employment_type,
+      "hiringOrganization": {
+        "@type": "Organization",
+        "name": job.company.name,
+        "sameAs": job.company.verified_at ? `${window.location.origin}/companies/${job.company.name.toLowerCase().replace(/\s+/g, '-')}` : undefined
+      },
+      "jobLocation": {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": job.city,
+          "addressRegion": job.state,
+          "addressCountry": job.country
+        },
+        "jobLocationType": job.location_mode === 'remote' ? 'TELECOMMUTE' : 'ONSITE'
+      },
+      "applicantLocationRequirements": job.location_mode === 'remote' ? {
+        "@type": "Country",
+        "name": "Worldwide"
+      } : undefined,
+      "baseSalary": job.salary_min ? {
+        "@type": "MonetaryAmount",
+        "currency": job.currency,
+        "value": {
+          "@type": "QuantitativeValue",
+          "minValue": job.salary_min,
+          "maxValue": job.salary_max || job.salary_min,
+          "unitText": "YEAR"
+        }
+      } : undefined,
+      "qualifications": job.tags.join(', '),
+      "experienceRequirements": job.seniority,
+      "url": `${window.location.origin}/jobs/${job.slug}`
+    }));
+
+    return {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "Job Listings",
+      "description": "Browse thousands of international job opportunities with transparent listings",
+      "numberOfItems": pagination.total,
+      "itemListElement": jobPostings.map((job, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "item": job
+      }))
+    };
+  };
+
   useEffect(() => {
     // Fetch from API whenever filters or page change
     fetchJobs();
@@ -141,7 +200,17 @@ export default function JobsIndex() {
 
   return (
     <>
-      <Head title="Find Your Next Job" />
+      <Head title="Find Your Next Job">
+        {/* JSON-LD Structured Data for SEO */}
+        {generateJobPostingSchema() && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(generateJobPostingSchema())
+            }}
+          />
+        )}
+      </Head>
       
       <div className="min-h-screen bg-gray-50">
         {/* Header */}

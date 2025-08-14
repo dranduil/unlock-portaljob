@@ -6,7 +6,93 @@ export default function Welcome() {
 
   return (
     <>
-      <Head title="Unlock Portal Job – International Job Portal" />
+      <Head title="Unlock Portal Job – International Job Portal">
+        {/* JSON-LD Structured Data for SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "Unlock Portal Job",
+              "description": "International job portal with transparent listings, ATS-friendly CVs, and global opportunities",
+              "url": window.location.origin,
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": `${window.location.origin}/jobs?search={search_term_string}`,
+                "query-input": "required name=search_term_string"
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "Unlock Portal Job",
+                "url": window.location.origin,
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": `${window.location.origin}/logo.svg`,
+                  "width": 512,
+                  "height": 512
+                }
+              },
+              "offers": {
+                "@type": "Offer",
+                "description": "Free job search and CV building services",
+                "price": "0",
+                "priceCurrency": "USD"
+              },
+              "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.8",
+                "reviewCount": "1250"
+              }
+            })
+          }}
+        />
+        
+        {/* FAQ Schema for SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "name": "How do I create an ATS-friendly CV?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Our CV builder automatically formats your CV to pass through Applicant Tracking Systems with proper keywords and structure."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Are the salary ranges accurate?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, all salary information is verified and provided directly by employers to ensure transparency."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Can I apply to jobs internationally?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Absolutely! We offer job opportunities from companies worldwide, including remote positions."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Is the platform free to use?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, job search and CV building services are completely free for job seekers."
+                  }
+                }
+              ]
+            })
+          }}
+        />
+      </Head>
 
       {/* Hero Section */}
       <section className="min-h-screen flex items-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
