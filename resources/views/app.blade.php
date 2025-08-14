@@ -8,26 +8,17 @@
         <script>
             (function() {
                 const appearance = '{{ $appearance ?? "system" }}';
-
                 if (appearance === 'system') {
                     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-                    if (prefersDark) {
-                        document.documentElement.classList.add('dark');
-                    }
+                    if (prefersDark) document.documentElement.classList.add('dark');
                 }
             })();
         </script>
 
         {{-- Inline style to set the HTML background color based on our theme in app.css --}}
         <style>
-            html {
-                background-color: oklch(1 0 0);
-            }
-
-            html.dark {
-                background-color: oklch(0.145 0 0);
-            }
+            html { background-color: oklch(1 0 0); }
+            html.dark { background-color: oklch(0.145 0 0); }
         </style>
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
@@ -37,97 +28,97 @@
         <meta name="keywords" content="jobs, careers, employment, international jobs, remote work, CV builder, ATS-friendly, job search">
         <meta name="author" content="Unlock Portal Job">
         <meta name="robots" content="index, follow">
-        
+
         {{-- Open Graph Meta Tags --}}
         <meta property="og:title" content="Unlock Portal Job – International Job Portal">
         <meta property="og:description" content="Find your dream job with transparent listings, ATS-friendly CVs, and global opportunities.">
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ url()->current() }}">
         <meta property="og:site_name" content="Unlock Portal Job">
-        
+
         {{-- Twitter Card Meta Tags --}}
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title" content="Unlock Portal Job – International Job Portal">
         <meta name="twitter:description" content="Find your dream job with transparent listings, ATS-friendly CVs, and global opportunities.">
-        
-        {{-- JSON-LD Structured Data for SEO --}}
-        <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "WebSite",
-            "name": "Unlock Portal Job",
-            "description": "International job portal with transparent listings, ATS-friendly CVs, and global opportunities",
-            "url": "{{ url('/') }}",
-            "potentialAction": {
-                "@type": "SearchAction",
-                "target": "{{ url('/jobs') }}?search={search_term_string}",
-                "query-input": "required name=search_term_string"
-            },
-            "publisher": {
-                "@type": "Organization",
-                "name": "Unlock Portal Job",
-                "url": "{{ url('/') }}",
-                "logo": {
-                    "@type": "ImageObject",
-                    "url": "{{ url('/logo.svg') }}",
-                    "width": 512,
-                    "height": 512
-                }
-            },
-            "sameAs": [
-                "https://www.linkedin.com/company/unlock-portal-job",
-                "https://twitter.com/unlockportaljob",
-                "https://www.facebook.com/unlockportaljob"
-            ]
-        }
-        </script>
-        
-        {{-- Organization Schema --}}
-        <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            "name": "Unlock Portal Job",
-            "description": "Leading international job portal connecting talented professionals with global opportunities",
-            "url": "{{ url('/') }}",
-            "logo": "{{ url('/logo.svg') }}",
-            "contactPoint": {
-                "@type": "ContactPoint",
-                "contactType": "customer service",
-                "email": "support@unlockportaljob.com",
-                "availableLanguage": ["English", "Spanish", "French", "German"]
-            },
-            "address": {
-                "@type": "PostalAddress",
-                "addressCountry": "International"
-            },
-            "foundingDate": "2024",
-            "numberOfEmployees": "50-100",
-            "industry": "Employment Services",
-            "serviceType": "Job Portal"
-        }
-        </script>
-        
+
+        {{-- JSON-LD Structured Data for SEO (built with PHP to avoid Blade parsing @context/@type) --}}
+        @php
+            $websiteLd = [
+                '@context' => 'https://schema.org',
+                '@type' => 'WebSite',
+                'name' => 'Unlock Portal Job',
+                'description' => 'International job portal with transparent listings, ATS-friendly CVs, and global opportunities',
+                'url' => url('/'),
+                'potentialAction' => [
+                    '@type' => 'SearchAction',
+                    'target' => url('/jobs') . '?search={search_term_string}',
+                    'query-input' => 'required name=search_term_string',
+                ],
+                'publisher' => [
+                    '@type' => 'Organization',
+                    'name' => 'Unlock Portal Job',
+                    'url' => url('/'),
+                    'logo' => [
+                        '@type' => 'ImageObject',
+                        'url' => url('/logo.svg'),
+                        'width' => 512,
+                        'height' => 512,
+                    ],
+                ],
+                'sameAs' => [
+                    'https://www.linkedin.com/company/unlock-portal-job',
+                    'https://twitter.com/unlockportaljob',
+                    'https://www.facebook.com/unlockportaljob',
+                ],
+            ];
+
+            $orgLd = [
+                '@context' => 'https://schema.org',
+                '@type' => 'Organization',
+                'name' => 'Unlock Portal Job',
+                'description' => 'Leading international job portal connecting talented professionals with global opportunities',
+                'url' => url('/'),
+                'logo' => url('/logo.svg'),
+                'contactPoint' => [
+                    '@type' => 'ContactPoint',
+                    'contactType' => 'customer service',
+                    'email' => 'support@unlockportaljob.com',
+                    'availableLanguage' => ['English', 'Spanish', 'French', 'German'],
+                ],
+                'address' => [
+                    '@type' => 'PostalAddress',
+                    'addressCountry' => 'International',
+                ],
+                'foundingDate' => '2024',
+                'numberOfEmployees' => '50-100',
+                'industry' => 'Employment Services',
+                'serviceType' => 'Job Portal',
+            ];
+        @endphp
+
+        <script type="application/ld+json">{!! json_encode($websiteLd, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}</script>
+        <script type="application/ld+json">{!! json_encode($orgLd, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}</script>
+
         {{-- Google Analytics 4 (GA4) --}}
         @if(config('google-analytics.enable_ga4') && config('google-analytics.ga4_measurement_id') !== 'GA_MEASUREMENT_ID')
-        <script async src="https://www.googletagmanager.com/gtag/js?id={{ config('google-analytics.ga4_measurement_id') }}"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '{{ config('google-analytics.ga4_measurement_id') }}');
-        </script>
+            <script async src="https://www.googletagmanager.com/gtag/js?id={{ config('google-analytics.ga4_measurement_id') }}"></script>
+            <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '{{ config('google-analytics.ga4_measurement_id') }}');
+            </script>
         @endif
-        
+
         {{-- Google Tag Manager (GTM) --}}
         @if(config('google-analytics.enable_gtm') && config('google-analytics.gtm_container_id') !== 'GTM-XXXXXXX')
-        <!-- Google Tag Manager -->
-        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-        })(window,document,'script','dataLayer','{{ config('google-analytics.gtm_container_id') }}');</script>
-        <!-- End Google Tag Manager -->
+            <!-- Google Tag Manager -->
+            <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','{{ config('google-analytics.gtm_container_id') }}');</script>
+            <!-- End Google Tag Manager -->
         @endif
 
         <link rel="icon" href="/favicon.ico" sizes="any">
@@ -145,12 +136,14 @@
     <body class="font-sans antialiased">
         {{-- Google Tag Manager (noscript) --}}
         @if(config('google-analytics.enable_gtm') && config('google-analytics.gtm_container_id') !== 'GTM-XXXXXXX')
-        <!-- Google Tag Manager (noscript) -->
-        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ config('google-analytics.gtm_container_id') }}"
-        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-        <!-- End Google Tag Manager (noscript) -->
+            <!-- Google Tag Manager (noscript) -->
+            <noscript>
+                <iframe src="https://www.googletagmanager.com/ns.html?id={{ config('google-analytics.gtm_container_id') }}"
+                        height="0" width="0" style="display:none;visibility:hidden"></iframe>
+            </noscript>
+            <!-- End Google Tag Manager (noscript) -->
         @endif
-        
+
         @inertia
     </body>
 </html>
