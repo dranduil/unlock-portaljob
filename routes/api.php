@@ -80,6 +80,7 @@ Route::prefix('v1')->group(function () {
         Route::middleware('company.member')->group(function () {
             Route::post('/companies/{companyId}/jobs', [JobController::class, 'store']);
             Route::patch('/jobs/{id}', [JobController::class, 'update']);
+            Route::post('/jobs/{id}/publish', [JobController::class, 'publish']);
             Route::post('/jobs/{id}/close', [JobController::class, 'close']);
         });
         

@@ -5,12 +5,20 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\JobPosting;
+use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ApplicationController extends Controller
 {
+    protected NotificationService $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     public function index(Request $request): JsonResponse
     {
         $apps = Application::with(['jobPosting.company'])
@@ -53,9 +61,15 @@ class ApplicationController extends Controller
             'source' => 'portal',
         ]);
 
+        // Load relationships for notification
+        $application->load(['jobPosting.company', 'candidate']);
+
+        // Send notification to HR/Recruiters about new application
+        $this->notificationService->notifyNewApplication($application);
+
         return response()->json([
             'message' => 'Application submitted',
-            'data' => $application->load(['jobPosting.company']),
+            'data' => $application,
         ], 201);
     }
 
@@ -77,9 +91,18 @@ class ApplicationController extends Controller
             return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
         }
 
-        $app = Application::findOrFail($id);
+        $app = Application::with(['jobPosting.company', 'candidate'])->findOrFail($id);
+        
+        // Store old status for notification
+        $oldStatus = $app->status;
+        
         // TODO: policy check
         $app->update($validator->validated());
+
+        // Send notification to candidate about status update
+        if ($oldStatus !== $app->status) {
+            $this->notificationService->notifyApplicationStatusUpdate($app, $oldStatus, $app->status);
+        }
 
         return response()->json([
             'message' => 'Application updated',

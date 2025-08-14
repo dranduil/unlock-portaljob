@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\JobPosting;
 use App\Models\Category;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -13,6 +14,13 @@ use Illuminate\Validation\Rule;
 
 class JobController extends Controller
 {
+    protected NotificationService $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     /**
      * Display a listing of jobs with filters
      */
@@ -70,7 +78,7 @@ class JobController extends Controller
         }
 
         if ($request->filled('seniority')) {
-            $query->where('seniority', $request->seniority);
+            $query->where('seniority', $request->type);
         }
 
         if ($request->filled('minSalary')) {
@@ -178,6 +186,30 @@ class JobController extends Controller
     }
 
     /**
+     * Publish a job posting and notify relevant candidates
+     */
+    public function publish(string $id): JsonResponse
+    {
+        $job = JobPosting::findOrFail($id);
+
+        // TODO: Check if user can publish this job
+        // This will be implemented with policies
+
+        $job->update([
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
+
+        // Send notifications to interested candidates
+        $this->notificationService->notifyNewJobPosted($job);
+
+        return response()->json([
+            'message' => 'Job published successfully',
+            'data' => $job->load(['company', 'categories'])
+        ]);
+    }
+
+    /**
      * Update the specified job
      */
     public function update(Request $request, string $id): JsonResponse
@@ -245,6 +277,9 @@ class JobController extends Controller
         // This will be implemented with policies
 
         $job->update(['status' => 'closed']);
+
+        // Send notifications to all applicants that the job is closed
+        $this->notificationService->notifyJobClosed($job);
 
         return response()->json([
             'message' => 'Job closed successfully',
