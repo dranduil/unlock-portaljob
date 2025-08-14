@@ -12,6 +12,10 @@ Artisan::command('seo:generate', function () {
     $this->call('seo:generate');
 })->purpose('Generate all SEO files (sitemap, robots.txt) for Google Search Console');
 
+Artisan::command('seo:multilingual', function () {
+    $this->call('seo:multilingual');
+})->purpose('Generate multilingual SEO files with hreflang support');
+
 Artisan::command('sitemap:generate', function () {
     $this->call('sitemap:generate');
 })->purpose('Generate a simple sitemap XML file');
@@ -19,6 +23,10 @@ Artisan::command('sitemap:generate', function () {
 Artisan::command('sitemap:index', function () {
     $this->call('sitemap:index');
 })->purpose('Generate sitemap index files for large sites');
+
+Artisan::command('sitemap:multilingual', function () {
+    $this->call('sitemap:multilingual');
+})->purpose('Generate multilingual sitemaps with hreflang support');
 
 Artisan::command('robots:generate', function () {
     $this->call('robots:generate');

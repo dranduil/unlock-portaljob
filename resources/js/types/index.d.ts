@@ -28,7 +28,16 @@ export interface SharedData {
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+    locale?: string;
+    supportedLocales?: Language[];
     [key: string]: unknown;
+}
+
+export interface Language {
+    code: string;
+    name: string;
+    native_name: string;
+    flag: string;
 }
 
 export interface User {
